@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Setup - CS Engineering Quiz App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .setup-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .btn-start {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-graduation-cap me-2"></i>CS Quiz App
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/quiz/setup"><i class="fas fa-play me-1"></i>Take Quiz</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/statistics"><i class="fas fa-chart-bar me-1"></i>Statistics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/student/results"><i class="fas fa-search me-1"></i>Results</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about"><i class="fas fa-info-circle me-1"></i>About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Quiz Setup Section -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="setup-card p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-cog fa-3x text-primary mb-3"></i>
+                        <h2 class="fw-bold mb-3">Setup Your Quiz</h2>
+                        <p class="text-muted">Configure your quiz preferences before starting</p>
+                    </div>
+
+                    <!-- Quiz Configuration Form -->
+                    <form action="/quiz/start" method="post" id="quizForm">
+                        <!-- Personal Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="studentName" class="form-label fw-bold">
+                                    <i class="fas fa-user me-2 text-primary"></i>Full Name *
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="studentName" 
+                                       name="studentName" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="studentEmail" class="form-label fw-bold">
+                                    <i class="fas fa-envelope me-2 text-primary"></i>Email Address *
+                                </label>
+                                <input type="email" class="form-control form-control-lg" id="studentEmail" 
+                                       name="studentEmail" placeholder="Enter your email" required>
+                            </div>
+                        </div>
+
+                        <!-- Quiz Settings -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="category" class="form-label fw-bold">
+                                    <i class="fas fa-bookmark me-2 text-success"></i>Category
+                                </label>
+                                <select class="form-select form-select-lg" id="category" name="category">
+                                    <option value="All">All Categories</option>
+                                    <option th:each="category : ${categories}" 
+                                            th:value="${category}" 
+                                            th:text="${category}">Category</option>
+                                </select>
+                                <small class="form-text text-muted">Select a specific category or choose all</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="difficulty" class="form-label fw-bold">
+                                    <i class="fas fa-chart-line me-2 text-warning"></i>Difficulty Level
+                                </label>
+                                <select class="form-select form-select-lg" id="difficulty" name="difficulty">
+                                    <option value="All">All Levels</option>
+                                    <option th:each="difficulty : ${difficulties}" 
+                                            th:value="${difficulty}" 
+                                            th:text="${difficulty}">Level</option>
+                                </select>
+                                <small class="form-text text-muted">Choose your preferred difficulty level</small>
+                            </div>
+                        </div>
+
+                        <!-- Number of Questions -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="questionCount" class="form-label fw-bold">
+                                    <i class="fas fa-list-ol me-2 text-info"></i>Number of Questions
+                                </label>
+                                <select class="form-select form-select-lg" id="questionCount" name="questionCount">
+                                    <option value="10">10 Questions (Quick Quiz)</option>
+                                    <option value="20" selected>20 Questions (Standard)</option>
+                                    <option value="30">30 Questions (Extended)</option>
+                                    <option value="50">50 Questions (Full Test)</option>
+                                </select>
+                                <small class="form-text text-muted">More questions provide better assessment</small>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-info mt-4">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Estimated Time:</strong>
+                                    <span id="estimatedTime">40-60 minutes</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instructions -->
+                        <div class="alert alert-primary mb-4">
+                            <h6 class="fw-bold mb-2">
+                                <i class="fas fa-exclamation-circle me-2"></i>Instructions:
+                            </h6>
+                            <ul class="mb-0">
+                                <li>Read each question carefully before selecting an answer</li>
+                                <li>You cannot go back to previous questions</li>
+                                <li>Your session will timeout after 30 minutes of inactivity</li>
+                                <li>Click "Submit" after answering all questions to see your results</li>
+                            </ul>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-start btn-lg text-white me-3">
+                                <i class="fas fa-rocket me-2"></i>Start Quiz
+                            </button>
+                            <a href="/" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${error}" class="container">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p class="mb-2">&copy; 2025 Computer Science Engineering Quiz App. All rights reserved.</p>
+            <p class="mb-0">
+                <i class="fas fa-code me-1"></i>
+                Built with Spring Boot & Thymeleaf for CSE Students
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update estimated time based on question count
+        document.getElementById('questionCount').addEventListener('change', function() {
+            const questionCount = parseInt(this.value);
+            let estimatedTime = '';
+            
+            switch(questionCount) {
+                case 10:
+                    estimatedTime = '20-30 minutes';
+                    break;
+                case 20:
+                    estimatedTime = '40-60 minutes';
+                    break;
+                case 30:
+                    estimatedTime = '60-90 minutes';
+                    break;
+                case 50:
+                    estimatedTime = '100-150 minutes';
+                    break;
+                default:
+                    estimatedTime = '40-60 minutes';
+            }
+            
+            document.getElementById('estimatedTime').textContent = estimatedTime;
+        });
+
+        // Form validation
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('studentEmail').value.trim();
+            
+            if (name === '' || email === '') {
+                e.preventDefault();
+                alert('Please fill in all required fields (Name and Email).');
+                return false;
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Starting Quiz...';
+            submitBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>

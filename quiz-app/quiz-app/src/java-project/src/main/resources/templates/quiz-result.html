@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results - CS Engineering Quiz App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .result-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(#28a745 0deg, #28a745 var(--score-angle), #e9ecef var(--score-angle), #e9ecef 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .score-inner {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .grade-excellent { color: #28a745; }
+        .grade-good { color: #20c997; }
+        .grade-average { color: #ffc107; }
+        .grade-poor { color: #fd7e14; }
+        .grade-fail { color: #dc3545; }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-graduation-cap me-2"></i>CS Quiz App
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/quiz/setup"><i class="fas fa-play me-1"></i>Take Quiz</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/statistics"><i class="fas fa-chart-bar me-1"></i>Statistics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/student/results"><i class="fas fa-search me-1"></i>Results</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about"><i class="fas fa-info-circle me-1"></i>About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Results Section -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="result-card p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-5">
+                        <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
+                        <h1 class="fw-bold mb-3">Quiz Complete!</h1>
+                        <p class="lead text-muted">Here are your results</p>
+                    </div>
+
+                    <!-- Student Info -->
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user me-2 text-primary"></i>Student: <span th:text="${result.studentName}">John Doe</span></h5>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-envelope me-2 text-primary"></i>Email: <span th:text="${result.studentEmail}">john@example.com</span></h5>
+                        </div>
+                    </div>
+
+                    <!-- Score Section -->
+                    <div class="row mb-5">
+                        <div class="col-md-6 text-center">
+                            <div class="score-circle mx-auto mb-3" th:style="'--score-angle: ' + (${result.score} * 3.6) + 'deg'">
+                                <div class="score-inner">
+                                    <h2 class="fw-bold mb-0" th:text="${#numbers.formatDecimal(result.score, 1, 1)} + '%'">85.5%</h2>
+                                    <small class="text-muted">Score</small>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold mb-2" 
+                                th:class="'grade-' + ${result.score >= 90 ? 'excellent' : (result.score >= 80 ? 'good' : (result.score >= 70 ? 'average' : (result.score >= 50 ? 'poor' : 'fail')))}"
+                                th:text="${result.grade}">A</h3>
+                            <p class="text-muted">Your Grade</p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <div class="stat-card p-3 text-center h-100">
+                                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                        <h4 class="fw-bold mb-0" th:text="${result.correctAnswers}">17</h4>
+                                        <small class="text-muted">Correct</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="stat-card p-3 text-center h-100">
+                                        <i class="fas fa-times-circle fa-2x text-danger mb-2"></i>
+                                        <h4 class="fw-bold mb-0" th:text="${result.incorrectAnswers}">3</h4>
+                                        <small class="text-muted">Incorrect</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="stat-card p-3 text-center h-100">
+                                        <i class="fas fa-list-ol fa-2x text-info mb-2"></i>
+                                        <h4 class="fw-bold mb-0" th:text="${result.totalQuestions}">20</h4>
+                                        <small class="text-muted">Total Questions</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="stat-card p-3 text-center h-100">
+                                        <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                        <h4 class="fw-bold mb-0">
+                                            <span th:text="${timeMinutes}">45</span>:<span th:text="${#numbers.formatInteger(timeSeconds, 2)}">30</span>
+                                        </h4>
+                                        <small class="text-muted">Time Taken</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="stat-card p-4 h-100">
+                                <h6 class="fw-bold mb-2">
+                                    <i class="fas fa-bookmark me-2 text-primary"></i>Category
+                                </h6>
+                                <p class="mb-0" th:text="${result.category}">All Categories</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stat-card p-4 h-100">
+                                <h6 class="fw-bold mb-2">
+                                    <i class="fas fa-calendar me-2 text-success"></i>Completed On
+                                </h6>
+                                <p class="mb-0" th:text="${#temporals.format(result.attemptDate, 'MMM dd, yyyy HH:mm')}">Dec 20, 2025 14:30</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Section -->
+                    <div class="alert alert-info mb-4">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-lightbulb me-2"></i>Personalized Feedback
+                        </h6>
+                        <p class="mb-0" th:text="${result.feedback}">
+                            Great job! You performed very well. Good time management! 
+                        </p>
+                    </div>
+
+                    <!-- Performance Analysis -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="stat-card p-4 text-center h-100">
+                                <div class="progress mb-2" style="height: 10px;">
+                                    <div class="progress-bar bg-success" 
+                                         th:style="'width: ' + ${result.score} + '%'" 
+                                         role="progressbar">
+                                    </div>
+                                </div>
+                                <h6 class="fw-bold mb-1">Overall Performance</h6>
+                                <small class="text-muted" th:text="${result.score >= 80 ? 'Excellent' : (result.score >= 60 ? 'Good' : 'Needs Improvement')}">Excellent</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card p-4 text-center h-100">
+                                <div class="progress mb-2" style="height: 10px;">
+                                    <div class="progress-bar bg-warning" 
+                                         th:style="'width: ' + ${(result.timeTaken < 3600) ? '100' : '50'} + '%'" 
+                                         role="progressbar">
+                                    </div>
+                                </div>
+                                <h6 class="fw-bold mb-1">Speed</h6>
+                                <small class="text-muted" th:text="${result.timeTaken < 1800 ? 'Fast' : (result.timeTaken < 3600 ? 'Good' : 'Slow')}">Good</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card p-4 text-center h-100">
+                                <div class="progress mb-2" style="height: 10px;">
+                                    <div class="progress-bar bg-info" 
+                                         th:style="'width: ' + ${(result.correctAnswers * 100 / result.totalQuestions > 70) ? '100' : '70'} + '%'" 
+                                         role="progressbar">
+                                    </div>
+                                </div>
+                                <h6 class="fw-bold mb-1">Accuracy</h6>
+                                <small class="text-muted" th:text="${(result.correctAnswers * 100 / result.totalQuestions) >= 80 ? 'High' : 'Moderate'}">High</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center">
+                        <a href="/quiz/setup" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-redo me-2"></i>Take Another Quiz
+                        </a>
+                        <a href="/statistics" class="btn btn-outline-secondary btn-lg me-3">
+                            <i class="fas fa-chart-bar me-2"></i>View Statistics
+                        </a>
+                        <a href="/" class="btn btn-outline-success btn-lg">
+                            <i class="fas fa-home me-2"></i>Back to Home
+                        </a>
+                    </div>
+
+                    <!-- Share Results -->
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-share me-1"></i>
+                            Share your achievement: 
+                            <span class="fw-bold" th:text="${result.studentName} + ' scored ' + ${#numbers.formatDecimal(result.score, 1, 1)} + '% on CS Quiz!'">
+                                John Doe scored 85.5% on CS Quiz!
+                            </span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Animation for High Scores -->
+    <div th:if="${result.score >= 80}" id="confetti"></div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p class="mb-2">&copy; 2025 Computer Science Engineering Quiz App. All rights reserved.</p>
+            <p class="mb-0">
+                <i class="fas fa-code me-1"></i>
+                Keep learning and improving your CS knowledge!
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animate score circle on load
+        window.addEventListener('load', function() {
+            const scoreCircle = document.querySelector('.score-circle');
+            if (scoreCircle) {
+                scoreCircle.style.background = 'conic-gradient(#e9ecef 0deg, #e9ecef 360deg)';
+                setTimeout(() => {
+                    scoreCircle.style.transition = 'all 2s ease-in-out';
+                    const score = [[${result.score}]];
+                    const angle = score * 3.6;
+                    scoreCircle.style.background = `conic-gradient(#28a745 0deg, #28a745 ${angle}deg, #e9ecef ${angle}deg, #e9ecef 360deg)`;
+                }, 500);
+            }
+        });
+
+        // Simple confetti effect for high scores
+        /*[# th:if="${result.score >= 80}" #]*/
+        function createConfetti() {
+            const confetti = document.getElementById('confetti');
+            if (!confetti) return;
+            
+            for (let i = 0; i < 50; i++) {
+                const piece = document.createElement('div');
+                piece.style.position = 'fixed';
+                piece.style.width = '10px';
+                piece.style.height = '10px';
+                piece.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                piece.style.left = Math.random() * window.innerWidth + 'px';
+                piece.style.top = '-10px';
+                piece.style.zIndex = '9999';
+                piece.style.pointerEvents = 'none';
+                
+                confetti.appendChild(piece);
+                
+                const fallDuration = Math.random() * 2 + 1;
+                piece.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight + 100}px) rotate(360deg)`, opacity: 0 }
+                ], {
+                    duration: fallDuration * 1000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                }).onfinish = () => piece.remove();
+            }
+        }
+        
+        // Trigger confetti for excellent scores
+        /*[# th:if="${result.score >= 90}" #]*/
+        setTimeout(createConfetti, 1000);
+        setTimeout(createConfetti, 2000);
+        /*[/]*/
+        
+        /*[# th:if="${result.score >= 80 && result.score < 90}" #]*/
+        setTimeout(createConfetti, 1500);
+        /*[/]*/
+        /*[/]*/
+    </script>
+</body>
+</html>
